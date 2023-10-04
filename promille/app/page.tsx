@@ -206,7 +206,7 @@ export default function Home() {
                 }}
               >
                 <Avatar src={user.pic} />
-                <Typography variant="h5" props="center">{user.name}</Typography>
+                <Typography variant="h5">{user.name}</Typography>
               </Box>
               <Typography variant="h5">
                 {Math.round(user.promille * 100) / 100}‰
