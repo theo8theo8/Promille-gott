@@ -1,8 +1,34 @@
 "use client";
 import { initializeApp } from "firebase/app";
-import { getDatabase, onValue, ref, set } from "firebase/database";
-import { Avatar, Box, Typography } from "@mui/material";
+import {
+  getDatabase,
+  increment,
+  onValue,
+  ref,
+  set,
+  update,
+} from "firebase/database";
+import {
+  Avatar,
+  Box,
+  Button,
+  Fab,
+  FormControl,
+  FormHelperText,
+  InputAdornment,
+  Modal,
+  OutlinedInput,
+  Typography,
+} from "@mui/material";
 import { useEffect, useState } from "react";
+import { SportsBar } from "@mui/icons-material";
+import {
+  LocalizationProvider,
+  MobileDateTimePicker,
+} from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs, { Dayjs } from "dayjs";
+import "dayjs/locale/sv";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAli6KOYZNuPL5RY2xR626oa3ZxXg6RIso",
@@ -26,6 +52,12 @@ interface User {
   pic: string;
 }
 
+interface Drink {
+  volume: number;
+  abv: number;
+  time: Dayjs;
+}
+
 function initDB() {
   const tms: User = {
     name: "Theo",
@@ -38,7 +70,7 @@ function initDB() {
     name: "Marcus",
     promille: 0,
     weight: 10000,
-    pic: "/static/images/avatar/marcus.jpg",
+    pic: "/static/images/avatar/marcus.png",
   };
 
   const sd: User = {
@@ -48,41 +80,199 @@ function initDB() {
     pic: "/static/images/avatar/simon.jpg",
   };
 
-  set(ref(db, "promille/"), [tms, mw, sd]);
+  set(ref(db, "users/"), [tms, mw, sd]);
+  set(ref(db, "latestUpdate/"), dayjs(new Date()).format());
 }
 
 export default function Home() {
-  const [promille, setPromille] = useState<User[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [currDrink, setCurrDrink] = useState<Drink>({} as Drink);
+  const [currModalUser, setCurrModalUser] = useState<User>();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [latestUpdate, setLatestUpdate] = useState<Dayjs>(dayjs(new Date()));
 
-  initDB();
+  function handleModalOpen(user: User) {
+    setCurrModalUser(user);
+    setModalOpen(true);
+  }
+
+  function handleModalClose() {
+    console.log("Test");
+    console.log(currDrink);
+
+    setModalOpen(false);
+    if (currDrink.volume && currDrink.abv /*&& currDrink.time*/) {
+      calcPromille();
+    }
+    currDrink.volume = 0;
+    currDrink.abv = 0;
+  }
+
+  function handleTimeChoice(date: Dayjs | null) {
+    console.log("HÄR");
+    let use = dayjs(new Date());
+    if (date) {
+      use = date;
+    }
+    setCurrDrink({
+      ...currDrink,
+      time: use,
+    });
+  }
+
+  function calcPromille() {
+    console.log("AAH");
+    const bac: number =
+      ((currDrink.volume * 10 * currDrink.abv) /
+        100 /
+        (currModalUser.weight * 1000 * 0.68)) *
+      1000;
+    const userIndex = users.findIndex(
+      (user) => user.name === currModalUser.name
+    );
+    update(ref(db, `users/${userIndex}`), { promille: increment(bac) });
+  }
+
+  function updateMetabolism() {
+    const currDate = dayjs(new Date());
+    const minuteDiff = currDate.diff(latestUpdate, "minute");
+    if (minuteDiff > 0) {
+      let dec = minuteDiff * 0.0025;
+      users.forEach((user) => {
+        const userIndex = users.findIndex((u) => u.name === user.name);
+        if (dec > user.promille) {
+          dec = user.promille;
+        }
+        update(ref(db, `users/${userIndex}`), {
+          promille: increment(-dec),
+        });
+      });
+      set(ref(db, "latestUpdate/"), currDate.format());
+    }
+  }
+
+  //initDB();
 
   useEffect(() => {
-    onValue(ref(db, "promille/"), (snapshot) => {
+    onValue(ref(db, "users/"), (snapshot) => {
       const data = snapshot.val();
-      setPromille(data);
+      setUsers(data);
+    });
+    onValue(ref(db, "latestUpdate/"), (snapshot) => {
+      const data = snapshot.val();
+      setLatestUpdate(dayjs(data));
     });
   }, []);
 
-  console.log(promille);
-
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      {promille.map((user) => (
-        <Box
-          key={user.name}
-          className="flex items-center"
-          sx={{
-            width: 200,
-            height: 50,
-            marginRight: 24,
-            backgroundColor: "primary.dark",
-          }}
-        >
-          <Avatar src={user.pic} />
-          <Typography variant="h4">{user.name}</Typography>
-          <Typography variant="h4">{user.promille}</Typography>
-        </Box>
-      ))}
-    </main>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="sv">
+      <main className="flex min-h-screen flex-col items-center justify-between p-24">
+        <Typography variant="h3">TMS Promilleräknare</Typography>
+        {users.map((user) => (
+          <Box
+            key={user.name}
+            className="flex justify-between items-center"
+            sx={{
+              backgroundColor: "primary.dark",
+            }}
+          >
+            <Box
+              className="flex flex-col items-center"
+              sx={{
+                padding: 1,
+                margin: 2,
+                border: 1,
+                borderRadius: 3,
+                backgroundColor: "secondary.light",
+              }}
+            >
+              <Avatar src={user.pic} />
+              <Typography variant="h5">{user.name}</Typography>
+            </Box>
+            <Typography variant="h5">
+              {Math.round(user.promille * 100) / 100} ‰
+            </Typography>
+            <Fab
+              onClick={() => handleModalOpen(user)}
+              variant="extended"
+              color="success"
+              sx={{
+                margin: 2,
+              }}
+            >
+              <SportsBar />
+              Add drink
+            </Fab>
+          </Box>
+        ))}
+        <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+          <Box
+            className="flex flex-col items-center justify-center"
+            sx={{
+              backgroundColor: "white",
+            }}
+          >
+            <Typography variant="h3">Add drink</Typography>
+            <FormControl sx={{ m: 1, width: "25ch" }} variant="outlined">
+              <OutlinedInput
+                id="outlined-adornment-weight"
+                endAdornment={
+                  <InputAdornment position="end">cl</InputAdornment>
+                }
+                aria-describedby="outlined-weight-helper-text"
+                inputProps={{
+                  "aria-label": "weight",
+                }}
+                onChange={(e) =>
+                  setCurrDrink({
+                    ...currDrink,
+                    volume: parseInt(e.target.value),
+                  })
+                }
+              />
+              <FormHelperText id="outlined-weight-helper-text">
+                Volume
+              </FormHelperText>
+            </FormControl>
+            <Typography variant="h4">of</Typography>
+            <FormControl sx={{ m: 1, width: "25ch" }} variant="outlined">
+              <OutlinedInput
+                id="outlined-adornment-weight"
+                endAdornment={<InputAdornment position="end">%</InputAdornment>}
+                aria-describedby="outlined-weight-helper-text"
+                inputProps={{
+                  "aria-label": "weight",
+                }}
+                onChange={(e) =>
+                  setCurrDrink({
+                    ...currDrink,
+                    abv: parseFloat(e.target.value),
+                  })
+                }
+              />
+              <FormHelperText id="outlined-weight-helper-text">
+                ABV
+              </FormHelperText>
+            </FormControl>
+            <Typography variant="h4">at</Typography>
+            <MobileDateTimePicker
+              disabled={true}
+              defaultValue={dayjs(new Date())}
+              onAccept={(e) => handleTimeChoice(e)}
+            />
+            <Button
+              onClick={() => handleModalClose()}
+              color="success"
+              sx={{
+                margin: 2,
+              }}
+            >
+              Add drink
+            </Button>
+          </Box>
+        </Modal>
+        <Button onClick={updateMetabolism}>Update Metabolism </Button>
+      </main>
+    </LocalizationProvider>
   );
 }
