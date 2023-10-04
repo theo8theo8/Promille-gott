@@ -190,7 +190,7 @@ export default function Home() {
             key={user.name}
             className="flex justify-center items-center flex-row flex-wrap"
             sx={{
-              backgroundColor: "#30BA39",
+              backgroundColor: "#59BA52",
               borderRadius: 5,
               margin: 2,
             }}
@@ -202,7 +202,7 @@ export default function Home() {
                   padding: 1,
                   margin: 2,
                   borderRadius: 3,
-                  backgroundColor: "#008612",
+                  backgroundColor: "#289C2A",
                 }}
               >
                 <Avatar src={user.pic} />
