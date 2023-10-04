@@ -174,43 +174,50 @@ export default function Home() {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="sv">
-      <main className="flex min-h-screen flex-col items-center justify-between p-24">
-        <Typography variant="h3">TMS Promilleräknare</Typography>
+      <main className="flex min-h-screen flex-col items-center justify-between px-24">
+        <Typography variant="h4" color="black" textAlign="center">TMS Promilleräknare</Typography>
         {users.map((user) => (
+          
           <Box
             key={user.name}
-            className="flex justify-between items-center"
+            className="flex justify-center items-center flex-row flex-wrap"
             sx={{
-              backgroundColor: "primary.dark",
+              backgroundColor: "#30BA39",
+              borderRadius: 5,
+              margin: 2,
             }}
           >
-            <Box
-              className="flex flex-col items-center"
-              sx={{
-                padding: 1,
-                margin: 2,
-                border: 1,
-                borderRadius: 3,
-                backgroundColor: "secondary.light",
-              }}
-            >
-              <Avatar src={user.pic} />
-              <Typography variant="h5">{user.name}</Typography>
+            <Box className="flex items-center space-x-4  mx-6">
+              <Box
+                className="flex flex-col items-center"
+                sx={{
+                  padding: 1,
+                  margin: 2,
+                  borderRadius: 3,
+                  backgroundColor: "#008612",
+                }}
+              >
+                <Avatar src={user.pic} />
+                <Typography variant="h5" props="center">{user.name}</Typography>
+              </Box>
+              <Typography variant="h5">
+                {Math.round(user.promille * 100) / 100}‰
+              </Typography>
+              <Typography variant="h5">{Math.floor(user.promille/0.0025)}min</Typography>
+              </Box>
+            <Box className="mr-6">
+              <Fab
+                onClick={() => handleModalOpen(user)}
+                variant="extended"
+                color="success"
+                sx={{
+                  margin: 2,
+                }}
+              >
+                <SportsBar />
+                Add drink
+              </Fab>
             </Box>
-            <Typography variant="h5">
-              {Math.round(user.promille * 100) / 100} ‰
-            </Typography>
-            <Fab
-              onClick={() => handleModalOpen(user)}
-              variant="extended"
-              color="success"
-              sx={{
-                margin: 2,
-              }}
-            >
-              <SportsBar />
-              Add drink
-            </Fab>
           </Box>
         ))}
         <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
