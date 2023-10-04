@@ -69,7 +69,7 @@ function initDB() {
   const mw: User = {
     name: "Marcus",
     promille: 0,
-    weight: 10000,
+    weight: 110,
     pic: "/static/images/avatar/marcus.png",
   };
 
@@ -150,7 +150,10 @@ export default function Home() {
         const userIndex = users.findIndex((u) => u.name === user.name);
         if (dec > user.promille) {
           dec = user.promille;
+        } else {
+          dec = minuteDiff * 0.0025;
         }
+
         update(ref(db, `users/${userIndex}`), {
           promille: increment(-dec),
         });
