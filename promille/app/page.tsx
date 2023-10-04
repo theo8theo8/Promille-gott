@@ -111,6 +111,7 @@ export default function Home() {
     if (currDrink.volume && currDrink.abv /*&& currDrink.time*/) {
       calcPromille();
     }
+
     currDrink.volume = 0;
     currDrink.abv = 0;
   }
