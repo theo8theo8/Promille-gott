@@ -229,70 +229,75 @@ export default function Home() {
           </Box>
         ))}
         <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-          <Box
-            className="flex flex-col items-center justify-center"
-            sx={{
-              backgroundColor: "white",
-            }}
-          >
-            <Typography variant="h3">Add drink</Typography>
-            <FormControl sx={{ m: 1, width: "25ch" }} variant="outlined">
-              <OutlinedInput
-                id="outlined-adornment-weight"
-                endAdornment={
-                  <InputAdornment position="end">cl</InputAdornment>
-                }
-                aria-describedby="outlined-weight-helper-text"
-                inputProps={{
-                  "aria-label": "weight",
-                }}
-                onChange={(e) =>
-                  setCurrDrink({
-                    ...currDrink,
-                    volume: parseInt(e.target.value),
-                  })
-                }
-              />
-              <FormHelperText id="outlined-weight-helper-text">
-                Volume
-              </FormHelperText>
-            </FormControl>
-            <Typography variant="h4">of</Typography>
-            <FormControl sx={{ m: 1, width: "25ch" }} variant="outlined">
-              <OutlinedInput
-                id="outlined-adornment-weight"
-                endAdornment={<InputAdornment position="end">%</InputAdornment>}
-                aria-describedby="outlined-weight-helper-text"
-                inputProps={{
-                  "aria-label": "weight",
-                }}
-                onChange={(e) =>
-                  setCurrDrink({
-                    ...currDrink,
-                    abv: parseFloat(e.target.value),
-                  })
-                }
-              />
-              <FormHelperText id="outlined-weight-helper-text">
-                ABV
-              </FormHelperText>
-            </FormControl>
-            <Typography variant="h4">at</Typography>
-            <MobileDateTimePicker
-              defaultValue={dayjs(new Date())}
-              onAccept={(e) => handleTimeChoice(e)}
-            />
-            <Button
-              onClick={() => handleModalClose()}
-              color="success"
+            <Box
+              className="flex flex-col items-center justify-center"
               sx={{
-                margin: 2,
+                backgroundColor: "white",
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
               }}
             >
-              Add drink
-            </Button>
-          </Box>
-        </Modal>
+              <Typography variant="h3" color="DimGray">Add drink</Typography>
+              <FormControl sx={{ m: 1, width: "25ch" }} variant="outlined">
+                <OutlinedInput
+                  id="outlined-adornment-weight"
+                  endAdornment={
+                    <InputAdornment position="end">cl</InputAdornment>
+                  }
+                  aria-describedby="outlined-weight-helper-text"
+                  inputProps={{
+                    "aria-label": "weight",
+                  }}
+                  onChange={(e) =>
+                    setCurrDrink({
+                      ...currDrink,
+                      volume: parseInt(e.target.value),
+                    })
+                  }
+                />
+                <FormHelperText id="outlined-weight-helper-text">
+                  Volume
+                </FormHelperText>
+              </FormControl>
+              <Typography variant="h4" color="DimGray">of</Typography>
+              <FormControl sx={{ m: 1, width: "25ch" }} variant="outlined">
+                <OutlinedInput
+                  id="outlined-adornment-weight"
+                  endAdornment={<InputAdornment position="end">%</InputAdornment>}
+                  aria-describedby="outlined-weight-helper-text"
+                  inputProps={{
+                    "aria-label": "weight",
+                  }}
+                  onChange={(e) =>
+                    setCurrDrink({
+                      ...currDrink,
+                      abv: parseFloat(e.target.value),
+                    })
+                  }
+                />
+                <FormHelperText id="outlined-weight-helper-text">
+                  ABV
+                </FormHelperText>
+              </FormControl>
+              <Typography variant="h4" color="DimGray">at</Typography>
+              <MobileDateTimePicker
+                defaultValue={dayjs(new Date())}
+                onAccept={(e) => handleTimeChoice(e)}
+              />
+              <Button
+                onClick={() => handleModalClose()}
+                color="success"
+                sx={{
+                  margin: 2,
+                }}
+              >
+                Add drink
+              </Button>
+            </Box>
+          </Modal>
         <Button onClick={updateMetabolism}>Update Metabolism </Button>
       </main>
     </LocalizationProvider>
