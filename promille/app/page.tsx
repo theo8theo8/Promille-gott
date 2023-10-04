@@ -129,7 +129,8 @@ export default function Home() {
   }
 
   function calcPromille() {
-    console.log("AAH");
+    updateMetabolism();
+
     const bac: number =
       ((currDrink.volume * 10 * currDrink.abv) /
         100 /
@@ -148,7 +149,7 @@ export default function Home() {
       let dec = minuteDiff * 0.0025;
       users.forEach((user) => {
         const userIndex = users.findIndex((u) => u.name === user.name);
-        if (dec > user.promille) {
+        if (dec >= user.promille) {
           dec = user.promille;
         } else {
           dec = minuteDiff * 0.0025;
