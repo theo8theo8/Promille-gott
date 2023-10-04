@@ -296,6 +296,12 @@ export default function Home() {
               >
                 Add drink
               </Button>
+              <Button
+                onClick={() => handleModalClose()}
+                color="error"
+              >
+                Close modal
+              </Button>
             </Box>
           </Modal>
         <Button onClick={updateMetabolism}>Update Metabolism </Button>
