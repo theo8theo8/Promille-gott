@@ -84,10 +84,17 @@ function initDB() {
   set(ref(db, "latestUpdate/"), dayjs(new Date()).format());
 }
 
+const test: User = {
+  name: "Test",
+  promille: 0,
+  weight: 10,
+  pic: "/static/images/avatar/test.jpg",
+};
+
 export default function Home() {
   const [users, setUsers] = useState<User[]>([]);
   const [currDrink, setCurrDrink] = useState<Drink>({} as Drink);
-  const [currModalUser, setCurrModalUser] = useState<User>();
+  const [currModalUser, setCurrModalUser] = useState<User>(test);
   const [modalOpen, setModalOpen] = useState(false);
   const [latestUpdate, setLatestUpdate] = useState<Dayjs>(dayjs(new Date()));
 
