@@ -55,7 +55,7 @@ interface User {
 interface Drink {
   volume: number;
   abv: number;
-  time: Dayjs;
+  time: Dayjs | null;
 }
 
 function initDB() {
@@ -69,14 +69,14 @@ function initDB() {
   const mw: User = {
     name: "Marcus",
     promille: 0,
-    weight: 10000,
+    weight: 110,
     pic: "/static/images/avatar/marcus.png",
   };
 
   const sd: User = {
     name: "Simon",
     promille: 0,
-    weight: 10000,
+    weight: 85,
     pic: "/static/images/avatar/simon.jpg",
   };
 
@@ -104,9 +104,6 @@ export default function Home() {
   }
 
   function handleModalClose() {
-    console.log("Test");
-    console.log(currDrink);
-
     setModalOpen(false);
     if (currDrink.volume && currDrink.abv /*&& currDrink.time*/) {
       calcPromille();
@@ -114,10 +111,11 @@ export default function Home() {
 
     currDrink.volume = 0;
     currDrink.abv = 0;
+    currDrink.time = null;
   }
 
   function handleTimeChoice(date: Dayjs | null) {
-    console.log("HÄR");
+    console.log("GHJKR");
     let use = dayjs(new Date());
     if (date) {
       use = date;
@@ -129,8 +127,9 @@ export default function Home() {
   }
 
   function calcPromille() {
-    console.log("AAH");
-    const bac: number =
+    updateMetabolism();
+
+    let bac: number =
       ((currDrink.volume * 10 * currDrink.abv) /
         100 /
         (currModalUser.weight * 1000 * 0.68)) *
@@ -138,6 +137,12 @@ export default function Home() {
     const userIndex = users.findIndex(
       (user) => user.name === currModalUser.name
     );
+    let timeDiff = 0;
+    if (currDrink.time) {
+      timeDiff = dayjs(new Date()).diff(currDrink.time, "minute");
+    }
+    bac -= timeDiff * 0.0025;
+
     update(ref(db, `users/${userIndex}`), { promille: increment(bac) });
   }
 
@@ -148,9 +153,12 @@ export default function Home() {
       let dec = minuteDiff * 0.0025;
       users.forEach((user) => {
         const userIndex = users.findIndex((u) => u.name === user.name);
-        if (dec > user.promille) {
+        if (dec >= user.promille) {
           dec = user.promille;
+        } else {
+          dec = minuteDiff * 0.0025;
         }
+
         update(ref(db, `users/${userIndex}`), {
           promille: increment(-dec),
         });
@@ -271,7 +279,6 @@ export default function Home() {
             </FormControl>
             <Typography variant="h4">at</Typography>
             <MobileDateTimePicker
-              disabled={true}
               defaultValue={dayjs(new Date())}
               onAccept={(e) => handleTimeChoice(e)}
             />
