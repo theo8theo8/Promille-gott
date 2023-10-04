@@ -182,7 +182,7 @@ export default function Home() {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="sv">
-      <main className="flex min-h-screen flex-col items-center justify-between px-24">
+      <main className="flex min-h-screen flex-col items-center justify-between px-24 py-4">
         <Typography variant="h4" color="black" textAlign="center">TMS Promilleräknare</Typography>
         {users.map((user) => (
           
@@ -195,7 +195,7 @@ export default function Home() {
               margin: 2,
             }}
           >
-            <Box className="flex items-center space-x-4  mx-6">
+            <Box className="flex items-center space-x-4  mx-4">
               <Box
                 className="flex flex-col items-center"
                 sx={{
@@ -213,7 +213,7 @@ export default function Home() {
               </Typography>
               <Typography variant="h5">{Math.floor(user.promille/0.0025)}min</Typography>
               </Box>
-            <Box className="mr-6">
+            <Box className="mr-4">
               <Fab
                 onClick={() => handleModalOpen(user)}
                 variant="extended"
